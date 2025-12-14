@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sourcing Copilot · Powered by Exa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2942 50%, #0d1b2e 100%);
+            min-height: 100vh;
+            padding: 60px 20px;
+            color: #e8f0fe;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b9eff 0%, #5fb3ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: #7a9cc6;
+            font-weight: 400;
+        }
+        
+        .powered-by {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 8px 16px;
+            background: rgba(59, 158, 255, 0.1);
+            border: 1px solid rgba(59, 158, 255, 0.25);
+            border-radius: 24px;
+            font-size: 0.9rem;
+            color: #3b9eff;
+            font-weight: 500;
+        }
+        
+        .search-box {
+            background: rgba(20, 35, 58, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 158, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #e8f0fe;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+        
+        input, select {
+            padding: 14px 18px;
+            background: rgba(10, 22, 40, 0.9);
+            border: 1px solid rgba(59, 158, 255, 0.25);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #e8f0fe;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        input::placeholder {
+            color: #5a6d8a;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b9eff;
+            background: rgba(10, 22, 40, 1);
+            box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.15);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b9eff 0%, #5fb3ff 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 158, 255, 0.5);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .secondary-btn {
+            background: rgba(59, 158, 255, 0.15);
+            border: 1px solid rgba(59, 158, 255, 0.3);
+            color: #3b9eff;
+        }
+        
+        .secondary-btn:hover {
+            background: rgba(59, 158, 255, 0.25);
+            box-shadow: 0 4px 16px rgba(59, 158, 255, 0.3);
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .results-count {
+            font-size: 1.1rem;
+            color: #7a9cc6;
+        }
+        
+        .compare-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .compare-btn.active {
+            display: block;
+        }
+        
+        .results {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .candidate-card {
+            background: rgba(20, 35, 58, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 158, 255, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .candidate-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 158, 255, 0.5);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .candidate-card.selected {
+            border-color: #3b9eff;
+            background: rgba(59, 158, 255, 0.08);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+        
+        .candidate-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #e8f0fe;
+            margin-bottom: 8px;
+            flex: 1;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .skill-match, .years-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(59, 158, 255, 0.2);
+            border: 1px solid rgba(59, 158, 255, 0.4);
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #3b9eff;
+        }
+        
+        .years-badge {
+            background: rgba(95, 179, 255, 0.15);
+            border-color: rgba(95, 179, 255, 0.3);
+            color: #5fb3ff;
+        }
+        
+        .education {
+            color: #7a9cc6;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        
+        .candidate-summary {
+            list-style: none;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .candidate-summary li {
+            padding-left: 28px;
+            position: relative;
+            color: #b8c9e0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .candidate-summary li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #3b9eff;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .publications {
+            margin: 16px 0;
+            padding: 20px;
+            background: rgba(10, 22, 40, 0.6);
+            border-left: 3px solid #3b9eff;
+            border-radius: 8px;
+        }
+        
+        .publications-title {
+            font-weight: 700;
+            color: #3b9eff;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .publications ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .publications li {
+            color: #b8c9e0;
+            font-size: 0.9rem;
+            padding: 10px;
+            background: rgba(59, 158, 255, 0.05);
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+        
+        .pub-title {
+            font-weight: 600;
+            color: #e8f0fe;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .pub-meta {
+            font-size: 0.85rem;
+            color: #7a9cc6;
+        }
+        
+        .pub-link {
+            color: #3b9eff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        
+        .pub-link:hover {
+            text-decoration: underline;
+        }
+        
+        .card-footer {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .candidate-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3b9eff 0%, #5fb3ff 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .candidate-link:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(59, 158, 255, 0.5);
+        }
+        
+        .compare-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(59, 158, 255, 0.1);
+            border: 1px solid rgba(59, 158, 255, 0.25);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: #7a9cc6;
+        }
+        
+        .compare-checkbox:hover {
+            background: rgba(59, 158, 255, 0.2);
+        }
+        
+        .compare-checkbox input {
+            width: auto;
+            cursor: pointer;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #3b9eff;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .loading:after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .comparison-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        .comparison-modal.active {
+            display: block;
+        }
+        
+        .comparison-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(20, 35, 58, 0.9);
+            border: 1px solid rgba(59, 158, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+        }
+        
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        
+        .comparison-header h2 {
+            font-size: 2rem;
+            color: #e8f0fe;
+        }
+        
+        .close-btn {
+            padding: 10px 20px;
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff6b6b;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .badges {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sourcing Copilot</h1>
+            <p class="subtitle">AI-powered technical recruiting with semantic search</p>
+            <div class="powered-by">
+                <span>⚡</span>
+                <span>Powered by Exa</span>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <form id="searchForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="role">Role Title</label>
+                        <input type="text" id="role" placeholder="e.g., Senior Data Engineer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="skills">Required Skills (comma-separated)</label>
+                        <input type="text" id="skills" placeholder="e.g., Python, Spark, SQL, AWS" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="minYears">Minimum Years Experience</label>
+                        <select id="minYears">
+                            <option value="">Any</option>
+                            <option value="2">2+ years</option>
+                            <option value="3">3+ years</option>
+                            <option value="5">5+ years</option>
+                            <option value="7">7+ years</option>
+                            <option value="10">10+ years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="companies">Target Companies (optional)</label>
+                        <input type="text" id="companies" placeholder="e.g., Google, Meta, Amazon">
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="submit" id="searchBtn">Search Candidates</button>
+                    <button type="button" class="secondary-btn" id="exportBtn" style="display:none;">Export to CSV</button>
+                    <button type="button" class="secondary-btn compare-btn" id="compareBtn">Compare Selected</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="results-header" style="display:none;" id="resultsHeader">
+            <div class="results-count" id="resultsCount"></div>
+        </div>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <div class="comparison-modal" id="comparisonModal">
+        <div class="comparison-content">
+            <div class="comparison-header">
+                <h2>Candidate Comparison</h2>
+                <button class="close-btn" onclick="closeComparison()">Close</button>
+            </div>
+            <div class="comparison-grid" id="comparisonGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let allCandidates = [];
+        let selectedCandidates = [];
+
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const role = document.getElementById('role').value.trim();
+            const skills = document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean);
+            const companiesInput = document.getElementById('companies').value.trim();
+            const companies = companiesInput ? companiesInput.split(',').map(c => c.trim()).filter(Boolean) : null;
+            const minYears = document.getElementById('minYears').value ? parseInt(document.getElementById('minYears').value) : null;
+            
+            const resultsDiv = document.getElementById('results');
+            const searchBtn = document.getElementById('searchBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const resultsHeader = document.getElementById('resultsHeader');
+            
+            searchBtn.disabled = true;
+            searchBtn.textContent = 'Searching';
+            resultsDiv.innerHTML = '<div class="loading">Searching for candidates</div>';
+            exportBtn.style.display = 'none';
+            resultsHeader.style.display = 'none';
+            selectedCandidates = [];
+            
+            try {
+                const response = await fetch(`${API_URL}/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role, skills, companies, min_years: minYears })
+                });
+                
+                if (!response.ok) throw new Error('Search failed');
+                
+                allCandidates = await response.json();
+                
+                if (allCandidates.length === 0) {
+                    resultsDiv.innerHTML = '<div class="error">No candidates found. Try different keywords.</div>';
+                    return;
+                }
+                
+                displayCandidates(allCandidates);
+                exportBtn.style.display = 'block';
+                resultsHeader.style.display = 'flex';
+                document.getElementById('resultsCount').textContent = `${allCandidates.length} candidates found`;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Search Candidates';
+            }
+        });
+
+        function displayCandidates(candidates) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = candidates.map((c, index) => `
+                <div class="candidate-card" id="card-${index}">
+                    <div class="card-header">
+                        <div style="flex: 1;">
+                            <div class="candidate-name">${c.name}</div>
+                            ${c.education ? `<div class="education">🎓 ${c.education}</div>` : ''}
+                        </div>
+                        <div class="badges">
+                            <div class="skill-match">
+                                <span>⚡</span>
+                                <span>${c.skill_match}% match</span>
+                            </div>
+                            ${c.years_experience ? `<div class="years-badge">📅 ${c.years_experience}</div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <ul class="candidate-summary">
+                        ${c.summary.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                    
+                    ${c.publications && c.publications.length > 0 ? `
+                        <div class="publications">
+                            <div class="publications-title">
+                                <span>📚</span>
+                                <span>Publications & Research (${c.publications.length})</span>
+                            </div>
+                            <ul>
+                                ${c.publications.map(p => `
+                                    <li>
+                                        <span class="pub-title">${p.title}</span>
+                                        ${p.year ? `<span class="pub-meta">Year: ${p.year}</span>` : ''}
+                                        ${p.url && p.url !== c.url ? `<a href="${p.url}" target="_blank" class="pub-link">View Paper →</a>` : ''}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="card-footer">
+                        <a href="${c.url}" target="_blank" class="candidate-link">
+                            View Profile
+                            <span>→</span>
+                        </a>
+                        <label class="compare-checkbox">
+                            <input type="checkbox" onchange="toggleCompare(${index}, this.checked)">
+                            <span>Compare</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleCompare(index, checked) {
+            const card = document.getElementById(`card-${index}`);
+            const compareBtn = document.getElementById('compareBtn');
+            
+            if (checked) {
+                selectedCandidates.push(allCandidates[index]);
+                card.classList.add('selected');
+            } else {
+                selectedCandidates = selectedCandidates.filter(c => c.url !== allCandidates[index].url);
+                card.classList.remove('selected');
+            }
+            
+            if (selectedCandidates.length >= 2) {
+                compareBtn.classList.add('active');
+            } else {
+                compareBtn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('compareBtn').addEventListener('click', () => {
+            if (selectedCandidates.length < 2) return;
+            
+            const modal = document.getElementById('comparisonModal');
+            const grid = document.getElementById('comparisonGrid');
+            
+            grid.innerHTML = selectedCandidates.map(c => `
+                <div class="candidate-card">
+                    <div class="card-header">
+                        <div style="flex: 1;">
+                            <div class="candidate-name">${c.name}</div>
+                            ${c.education ? `<div class="education">🎓 ${c.education}</div>` : ''}
+                        </div>
+                        <div class="badges">
+                            <div class="skill-match">⚡ ${c.skill_match}%</div>
+                            ${c.years_experience ? `<div class="years-badge">📅 ${c.years_experience}</div>` : ''}
+                        </div>
+                    </div>
+                    <ul class="candidate-summary">
+                        ${c.summary.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                    ${c.publications && c.publications.length > 0 ? `
+                        <div class="publications">
+                            <div class="publications-title">📚 Publications (${c.publications.length})</div>
+                            <ul>
+                                ${c.publications.slice(0, 3).map(p => `
+                                    <li>
+                                        <span class="pub-title">${p.title}</span>
+                                        ${p.year ? `<span class="pub-meta">Year: ${p.year}</span>` : ''}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    <a href="${c.url}" target="_blank" class="candidate-link">View Profile →</a>
+                </div>
+            `).join('');
+            
+            modal.classList.add('active');
+        });
+
+        function closeComparison() {
+            document.getElementById('comparisonModal').classList.remove('active');
+        }
+
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            if (allCandidates.length === 0) return;
+            
+            const csv = [
+                ['Name', 'URL', 'Skill Match %', 'Years Experience', 'Education', 'Summary', 'Publications'].join(','),
+                ...allCandidates.map(c => [
+                    `"${c.name}"`,
+                    `"${c.url}"`,
+                    c.skill_match,
+                    `"${c.years_experience || ''}"`,
+                    `"${c.education || ''}"`,
+                    `"${c.summary.join('; ')}"`,
+                    `"${c.publications.map(p => p.title).join('; ')}"`
+                ].join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `candidates_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        });
+    </script>
+</body>
+</html>
