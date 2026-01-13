@@ -2,6 +2,10 @@ from exa_py import Exa
 from typing import List, Optional, Dict
 import os
 import re
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 exa = Exa(api_key=os.environ.get("EXA_API_KEY"))
 
